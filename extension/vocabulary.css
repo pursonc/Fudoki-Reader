@@ -1,0 +1,271 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.vocab-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  min-height: 100vh;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.vocab-header {
+  padding: 20px;
+  background: linear-gradient(135deg, #4a90e2, #9013fe);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.vocab-header h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.vocab-stats {
+  background: rgba(255,255,255,0.2);
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 12px;
+}
+
+.vocab-tabs {
+  display: flex;
+  border-bottom: 1px solid #eee;
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 15px;
+  border: none;
+  background: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #888;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  color: #4a90e2;
+  border-bottom-color: #4a90e2;
+}
+
+.vocab-list {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.vocab-item {
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 10px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+
+.vocab-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.vocab-word-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 5px;
+}
+
+.vocab-word {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.vocab-reading {
+  font-size: 14px;
+  color: #666;
+  margin-left: 10px;
+}
+
+.vocab-context {
+  font-size: 12px;
+  color: #888;
+  margin-top: 5px;
+  font-style: italic;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.vocab-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #f5f5f5;
+}
+
+.vocab-level {
+  font-size: 10px;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.vocab-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-remember {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+.btn-remember:hover { background: #bbdefb; }
+
+.btn-forgot {
+  background: #ffebee;
+  color: #c62828;
+}
+.btn-forgot:hover { background: #ffcdd2; }
+
+.btn-delete {
+  background: none;
+  color: #999;
+  padding: 6px;
+}
+.btn-delete:hover { color: #f44336; }
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 20px;
+  text-align: center;
+  color: #888;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  body { background-color: #1a1a1a; color: #eee; }
+  .vocab-container { background: #222; }
+  .vocab-tabs { background: #222; border-bottom-color: #333; }
+  .vocab-item { background: #2c2c2c; border-color: #333; }
+  .vocab-word { color: #eee; }
+  .vocab-reading { color: #aaa; }
+  .vocab-context { color: #777; }
+  .vocab-meta { border-top-color: #333; }
+  .btn-remember { background: #1565c0; color: #e3f2fd; }
+  .btn-forgot { background: #c62828; color: #ffebee; }
+}
+
+/* Token Styles */
+.vocab-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.vocab-token {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 2px;
+}
+
+.vocab-token-reading {
+  font-size: 10px;
+  color: #888;
+  margin-bottom: 2px;
+  min-height: 12px;
+}
+
+.vocab-token-surface {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  line-height: 1.2;
+}
+
+.vocab-token-pos {
+  width: 100%;
+  height: 3px;
+  margin-top: 2px;
+  border-radius: 2px;
+  background: transparent;
+}
+
+.vocab-token-pos-label {
+  font-size: 10px;
+  color: #999;
+  margin-top: 2px;
+  text-align: center;
+  line-height: 1;
+}
+
+.vocab-translation {
+  font-size: 14px;
+  color: #666;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #eee;
+}
+
+/* POS Colors */
+.pos-noun { background-color: #4caf50; }
+.pos-verb { background-color: #2196f3; }
+.pos-adj { background-color: #ff9800; }
+.pos-adv { background-color: #9c27b0; }
+.pos-particle { background-color: #f44336; }
+.pos-aux { background-color: #795548; }
+.pos-conj { background-color: #607d8b; }
+.pos-adn { background-color: #00bcd4; }
+.pos-int { background-color: #ffeb3b; }
+
+/* Dark Mode Updates */
+@media (prefers-color-scheme: dark) {
+  .vocab-token-surface { color: #eee; }
+  .vocab-token-reading { color: #aaa; }
+  .vocab-token-pos-label { color: #777; }
+  .vocab-translation { color: #aaa; border-top-color: #444; }
+}

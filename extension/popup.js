@@ -8,10 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const ttsSpeedInput = document.getElementById('tts-speed');
   const ttsSpeedVal = document.getElementById('tts-speed-val');
   const languageSelect = document.getElementById('language-select');
+  const openVocabBtn = document.getElementById('open-vocab');
 
   const translations = {
     en: {
       settingsTitle: "Fudoki Reader Settings",
+      openVocab: "Vocabulary Book",
       enableExtension: "Enable Extension",
       readingMode: "Reading Mode",
       modeHiragana: "Hiragana",
@@ -32,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     zh: {
       settingsTitle: "Fudoki Reader 设置",
+      openVocab: "生词本",
       enableExtension: "启用扩展",
       readingMode: "注音模式",
       modeHiragana: "平假名",
@@ -52,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     ja: {
       settingsTitle: "Fudoki Reader 設定",
+      openVocab: "単語帳",
       enableExtension: "拡張機能を有効化",
       readingMode: "読み仮名モード",
       modeHiragana: "ひらがな",
@@ -146,6 +150,13 @@ document.addEventListener('DOMContentLoaded', () => {
     updateLanguage(languageSelect.value);
     updateSettings();
   });
+
+  // Open Vocabulary Book
+  if (openVocabBtn) {
+    openVocabBtn.addEventListener('click', () => {
+      chrome.tabs.create({ url: 'vocabulary.html' });
+    });
+  }
 
   // Save state on change
   enableCheckbox.addEventListener('change', updateSettings);

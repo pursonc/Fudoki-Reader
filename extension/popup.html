@@ -93,6 +93,24 @@
     .github-link:hover {
       color: var(--hover-color);
     }
+    .vocab-btn {
+      width: 100%;
+      padding: 8px;
+      margin-top: 10px;
+      background: var(--hover-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .vocab-btn:hover {
+      opacity: 0.9;
+    }
     .github-icon {
       width: 16px;
       height: 16px;
@@ -110,6 +128,12 @@
     </select>
   </div>
   
+  <div class="setting-item">
+    <button id="open-vocab" class="vocab-btn">
+      <span>📚</span> <span data-i18n="openVocab">Vocabulary Book</span>
+    </button>
+  </div>
+
   <div class="setting-item">
     <label for="enable-extension" data-i18n="enableExtension">Enable Extension</label>
     <input type="checkbox" id="enable-extension" checked>
