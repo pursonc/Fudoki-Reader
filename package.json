@@ -1,0 +1,13 @@
+{
+  "name": "fudoki-reader-build",
+  "version": "1.0.0",
+  "description": "Build script for Fudoki Reader extension",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "devDependencies": {
+    "archiver": "^7.0.0",
+    "fs-extra": "^11.2.0",
+    "terser": "^5.31.0"
+  }
+}

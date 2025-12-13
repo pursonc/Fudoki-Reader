@@ -11,6 +11,7 @@
   --fudoki-translation-border: #eee;
   --fudoki-translation-text: #555;
   --fudoki-actions-border: #f0f0f0;
+  --fudoki-highlight-bg: rgba(255, 235, 59, 0.3);
 }
 
 .fudoki-theme-dark {
@@ -26,6 +27,7 @@
   --fudoki-translation-border: #444;
   --fudoki-translation-text: #ccc;
   --fudoki-actions-border: #444;
+  --fudoki-highlight-bg: rgba(255, 235, 59, 0.2);
 }
 
 .fudoki-popup {
@@ -58,6 +60,12 @@
   align-items: center;
   margin: 0 2px;
   position: relative;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.fudoki-token.fudoki-highlight {
+  background-color: var(--fudoki-highlight-bg);
 }
 
 .fudoki-reading {

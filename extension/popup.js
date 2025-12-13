@@ -7,8 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const themeSelect = document.getElementById('theme-select');
   const ttsSpeedInput = document.getElementById('tts-speed');
   const ttsSpeedVal = document.getElementById('tts-speed-val');
-  const languageSelect = document.getElementById('language-select');
+  const languageFlags = document.querySelectorAll('.lang-flag');
   const openVocabBtn = document.getElementById('open-vocab');
+  let currentLang = 'en';
 
   const translations = {
     en: {
@@ -86,11 +87,21 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateLanguage(lang) {
+    currentLang = lang;
     const t = translations[lang] || translations.en;
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
       if (t[key]) {
         el.textContent = t[key];
+      }
+    });
+
+    // Update active flag
+    languageFlags.forEach(flag => {
+      if (flag.dataset.lang === lang) {
+        flag.classList.add('active');
+      } else {
+        flag.classList.remove('active');
       }
     });
   }
@@ -103,13 +114,14 @@ document.addEventListener('DOMContentLoaded', () => {
     showPosCheckbox.checked = result.fudoki_show_pos === true;
     translateTargetSelect.value = result.fudoki_translate_target || 'zh-CN';
     themeSelect.value = result.fudoki_theme || 'system';
-    languageSelect.value = result.fudoki_language || 'en';
+    
+    const lang = result.fudoki_language || 'en';
+    updateLanguage(lang);
     
     const speed = result.fudoki_tts_speed || 1.0;
     ttsSpeedInput.value = speed;
     ttsSpeedVal.textContent = speed;
 
-    updateLanguage(languageSelect.value);
     applyTheme(themeSelect.value);
   });
 
@@ -122,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
       fudoki_translate_target: translateTargetSelect.value,
       fudoki_theme: themeSelect.value,
       fudoki_tts_speed: parseFloat(ttsSpeedInput.value),
-      fudoki_language: languageSelect.value
+      fudoki_language: currentLang
     };
 
     applyTheme(settings.fudoki_theme);
@@ -146,9 +158,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Language change handler
-  languageSelect.addEventListener('change', () => {
-    updateLanguage(languageSelect.value);
-    updateSettings();
+  languageFlags.forEach(flag => {
+    flag.addEventListener('click', () => {
+      updateLanguage(flag.dataset.lang);
+      updateSettings();
+    });
   });
 
   // Open Vocabulary Book
