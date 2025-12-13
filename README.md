@@ -17,7 +17,7 @@ Fudoki Reader is a Chrome Extension that segments Japanese text, shows part-of-s
 *   **Text Analysis**: Kuromoji.js-based segmentation, POS tags, kana, and romaji.
 *   **Dictionary**: Built-in JMDict integration; click a word to view translations.
 *   **Vocabulary Book**: Save words with context and review them using a built-in SRS (Spaced Repetition System).
-*   **Speech Synthesis**: Read text aloud with adjustable speed (0.5–2.0x) and voice selection.
+*   **Advanced Speech Synthesis**: Read text aloud with adjustable speed (0.1x–1.5x), karaoke-style highlighting, and granular controls (Play/Pause, Restart, Previous/Next Word).
 *   **Offline Capable**: All analysis and dictionary lookups happen locally within the extension.
 *   **Theme Support**: Light, Dark, and System theme modes.
 
@@ -39,7 +39,7 @@ Fudoki Reader は、ブラウザで動作する日本語テキスト解析・音
 *   **形態素解析**: 分割、品詞、読み（かな／ローマ字）を表示。
 *   **辞書機能**: JMdict と連携、単語をクリックして訳語を表示。
 *   **単語帳**: 文脈付きで単語を保存し、内蔵のSRS（間隔反復システム）で復習できます。
-*   **音声合成**: 読み上げ速度（0.5–2.0倍）や声の選択が可能。
+*   **高度な音声合成**: 読み上げ速度（0.1–1.5倍）の調整、カラオケ風のハイライト表示、詳細な再生コントロール（再生/一時停止、リスタート、前/次の単語）に対応。
 *   **オフライン対応**: 解析と辞書検索はすべてローカルで行われます。
 *   **テーマ対応**: ライト、ダーク、システム設定に追従するテーマ切り替え。
 
@@ -61,7 +61,7 @@ Fudoki Reader 是一款基于浏览器的日语文本分析与语音朗读 Chrom
 *   **文本分析**: 分词、词性、假名与罗马音显示。
 *   **内置词典**: 整合 JMdict；点击单词即可查看释义。
 *   **生词本**: 保存单词及其上下文，并使用内置的 SRS（间隔重复系统）进行复习。
-*   **语音合成**: 支持朗读文本，可调节语速 (0.5–2.0x) 和选择音色。
+*   **高级语音合成**: 支持朗读文本，可调节语速 (0.1–1.5x)，支持卡拉OK式高亮显示，并提供精细控制（播放/暂停、重新开始、上/下个单词）。
 *   **离线可用**: 所有分析和词典查询均在本地完成。
 *   **主题支持**: 支持浅色、深色及跟随系统的外观模式。
 
@@ -84,6 +84,20 @@ Fudoki Reader 是一款基于浏览器的日语文本分析与语音朗读 Chrom
 | 🟣 | Adverb | 副詞 | 副词 |
 | 🔴 | Particle | 助詞 | 助词 |
 | 🟡 | Interjection | 感動詞 | 感叹词 |
+
+### Build & Packaging
+
+To package the extension for distribution (Chrome Web Store):
+
+1.  Install dependencies:
+    ```bash
+    npm install
+    ```
+2.  Run the build script:
+    ```bash
+    npm run build
+    ```
+    This will create a `dist/` folder containing the minified code and a zip file.
 
 ### Development
 

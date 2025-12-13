@@ -102,9 +102,10 @@ const headerSpeedValue = $('headerSpeedValue');
     tokenAlignLeft: 'tokenAlignLeft'
   };
 
-  // Initialize EasyMDE Markdown editor
+  // Initialize EasyMDE Markdown editor (Removed)
   let easymde = null;
   
+  /* EasyMDE removed
   if (textInput && typeof EasyMDE !== 'undefined') {
     easymde = new EasyMDE({
       element: textInput,
@@ -126,77 +127,10 @@ const headerSpeedValue = $('headerSpeedValue');
         codeSyntaxHighlighting: false
       }
     });
+    // ... (rest of the removed code)
+  }
+  */
 
-    // Override textInput object properties and methods to be compatible with markdown editor
-    // Since textInput itself is an HTML element, we can add new properties/methods
-    const originalGetValue = function() { return this.value; };
-    const originalSetValue = function(val) { this.value = val; };
-    
-    Object.defineProperty(textInput, 'value', {
-      get: function() {
-        return easymde ? easymde.value() : '';
-      },
-      set: function(val) {
-        if (easymde) {
-          easymde.value(val || '');
-        }
-      },
-      configurable: true
-    });
-
-    // Save original addEventListener method
-    const originalAddEventListener = textInput.addEventListener.bind(textInput);
-    
-    textInput.addEventListener = function(event, handler, options) {
-      if (event === 'input' && easymde) {
-        easymde.codemirror.on('change', handler);
-      } else if (event === 'focus' && easymde) {
-        easymde.codemirror.on('focus', handler);
-      } else if (event === 'blur' && easymde) {
-        easymde.codemirror.on('blur', handler);
-      } else {
-        originalAddEventListener(event, handler, options);
-      }
-    };
-
-    // Save original focus method
-    const originalFocus = textInput.focus.bind(textInput);
-    
-    textInput.focus = function() {
-      if (easymde && easymde.codemirror) {
-        easymde.codemirror.focus();
-      } else {
-        originalFocus();
-      }
-    };
-
-    // Save markdown editor instance to global for debugging
-    window._markdownEditor = easymde;
-
-    // Add function to automatically clean leading empty lines on blur
-    easymde.codemirror.on('blur', () => {
-      const currentValue = easymde.value();
-      if (!currentValue) return;
-      
-      // Clean all leading empty lines and whitespace characters
-      const trimmedValue = currentValue.replace(/^[\s\n\r]+/, '');
-      
-      // If content changed, update editor
-      if (trimmedValue !== currentValue) {
-        // Save current cursor position
-        const cursor = easymde.codemirror.getCursor();
-        
-        // Update content
-        easymde.value(trimmedValue);
-        
-        // Try to restore cursor position (adjust line number)
-        const removedLines = currentValue.split('\n').length - trimmedValue.split('\n').length;
-        const newLine = Math.max(0, cursor.line - removedLines);
-        easymde.codemirror.setCursor({ line: newLine, ch: cursor.ch });
-        
-        console.log('Cleaned leading whitespace/empty lines');
-      }
-    });
 
     // Intercept EasyMDE side-by-side button, change to toggle two-pane mode
     setTimeout(() => {
@@ -635,7 +569,6 @@ const headerSpeedValue = $('headerSpeedValue');
         });
       }
     }, 500);
-  }
 
   const PWA_MANIFEST_URL = 'static/pwa-assets.json';
   const PWA_CACHE_PREFIX = 'fudoki-cache';

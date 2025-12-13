@@ -232,8 +232,18 @@ function renderResult(tokens, originalText) {
         <svg viewBox="0 0 24 24"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
       </button>
       ` : ''}
+      <div style="width: 1px; height: 24px; background: var(--fudoki-border); margin: 0 4px;"></div>
+      <button class="fudoki-btn" id="fudoki-prev-btn" title="Previous Word">
+        <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+      </button>
       <button class="fudoki-btn" id="fudoki-play-btn" title="Play">
         <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <button class="fudoki-btn" id="fudoki-next-btn" title="Next Word">
+        <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+      </button>
+      <button class="fudoki-btn" id="fudoki-restart-btn" title="Restart" style="display:none;">
+        <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
       </button>
     </div>
   `;
@@ -271,11 +281,165 @@ function renderResult(tokens, originalText) {
   });
 
   const playBtn = currentPopup.querySelector('#fudoki-play-btn');
-  playBtn.addEventListener('click', (e) => {
-    e.stopPropagation(); // Prevent bubbling
-    const rate = parseFloat(settings.fudoki_tts_speed) || 1.0;
-    speakText(originalText, rate);
+  const restartBtn = currentPopup.querySelector('#fudoki-restart-btn');
+  const prevBtn = currentPopup.querySelector('#fudoki-prev-btn');
+  const nextBtn = currentPopup.querySelector('#fudoki-next-btn');
+  
+  const playIcon = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+  const pauseIcon = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+
+  // Pre-calculate token boundaries for highlighting
+  let currentLength = 0;
+  const tokenBoundaries = tokens.map(t => {
+    const start = currentLength;
+    currentLength += t.surface.length;
+    return { start, end: currentLength };
   });
+
+  let currentTokenIndex = 0;
+  let isStepping = false;
+
+  const updateHighlight = (charIndex) => {
+    const tokenEls = currentPopup.querySelectorAll('.fudoki-token');
+    tokenEls.forEach(el => el.classList.remove('fudoki-highlight'));
+    
+    if (charIndex === null) return;
+
+    // Find token containing charIndex
+    // If we are playing partial text, charIndex is relative to start of partial text
+    // But here we expect absolute charIndex if we manage it correctly
+    
+    const tokenIndex = tokenBoundaries.findIndex(b => charIndex >= b.start && charIndex < b.end);
+    if (tokenIndex !== -1 && tokenEls[tokenIndex]) {
+      tokenEls[tokenIndex].classList.add('fudoki-highlight');
+      currentTokenIndex = tokenIndex;
+    }
+  };
+  
+  const highlightToken = (index) => {
+    const tokenEls = currentPopup.querySelectorAll('.fudoki-token');
+    tokenEls.forEach(el => el.classList.remove('fudoki-highlight'));
+    if (tokenEls[index]) {
+      tokenEls[index].classList.add('fudoki-highlight');
+    }
+  };
+
+  const onStart = () => {
+    playBtn.innerHTML = pauseIcon;
+    playBtn.title = "Pause";
+    restartBtn.style.display = 'flex';
+  };
+
+  const onEnd = () => {
+    playBtn.innerHTML = playIcon;
+    playBtn.title = "Play";
+    if (!isStepping) {
+      restartBtn.style.display = 'none';
+      updateHighlight(null);
+      currentTokenIndex = 0;
+    } else {
+      // If stepping, keep highlight on current token
+      // But reset play button
+    }
+    isStepping = false;
+  };
+
+  const onBoundary = (event) => {
+    if (event.name === 'word') {
+      // If playing full text, event.charIndex is absolute
+      // If playing partial, we need offset
+      // But SpeechController.play is generic.
+      // Let's handle offset in the caller if needed.
+      // For now, assume full text playback for "Play" button
+      updateHighlight(event.charIndex);
+    }
+  };
+
+  playBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const rate = parseFloat(settings.fudoki_tts_speed) || 1.0;
+    
+    // If we are at the end, restart
+    if (currentTokenIndex >= tokens.length - 1 && !SpeechController.isPlaying) {
+      currentTokenIndex = 0;
+    }
+
+    // Calculate text to speak from current position
+    // We need to map currentTokenIndex to char index
+    const startCharIndex = tokenBoundaries[currentTokenIndex].start;
+    const textToSpeak = originalText.substring(startCharIndex);
+    
+    const onBoundaryWithOffset = (event) => {
+      if (event.name === 'word') {
+        updateHighlight(event.charIndex + startCharIndex);
+      }
+    };
+
+    const state = SpeechController.toggle(
+      textToSpeak, 
+      rate, 
+      onStart, 
+      onEnd, 
+      onBoundaryWithOffset
+    );
+
+    if (state === 'paused') {
+      playBtn.innerHTML = playIcon;
+      playBtn.title = "Resume";
+    } else if (state === 'resumed') {
+      playBtn.innerHTML = pauseIcon;
+      playBtn.title = "Pause";
+    }
+  });
+
+  restartBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const rate = parseFloat(settings.fudoki_tts_speed) || 1.0;
+    currentTokenIndex = 0;
+    SpeechController.play(originalText, rate, onStart, onEnd, onBoundary);
+  });
+  
+  prevBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (currentTokenIndex > 0) {
+      currentTokenIndex--;
+      playSingleToken(currentTokenIndex);
+    }
+  });
+  
+  nextBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (currentTokenIndex < tokens.length - 1) {
+      currentTokenIndex++;
+      playSingleToken(currentTokenIndex);
+    }
+  });
+  
+  const playSingleToken = (index) => {
+    isStepping = true;
+    const token = tokens[index];
+    const rate = parseFloat(settings.fudoki_tts_speed) || 1.0;
+    
+    highlightToken(index);
+    
+    // Update UI to show playing state (optional, maybe just highlight is enough)
+    // playBtn.innerHTML = pauseIcon; 
+    
+    SpeechController.play(
+      token.surface, 
+      rate, 
+      () => { /* onStart */ }, 
+      () => { 
+        /* onEnd */ 
+        // Keep highlight
+        playBtn.innerHTML = playIcon;
+        playBtn.title = "Play";
+        // Don't hide restart button if we are in middle of text?
+        restartBtn.style.display = 'flex';
+      }, 
+      null // No boundary needed for single word
+    );
+  };
 
   if (showTranslate) {
     const translateBtn = currentPopup.querySelector('#fudoki-translate-btn');
@@ -326,22 +490,82 @@ function getJapaneseVoice() {
   return voice;
 }
 
-function speakText(text, rate) {
-  // Cancel any ongoing speech
-  window.speechSynthesis.cancel();
-
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'ja-JP';
-  utterance.rate = rate;
+const SpeechController = {
+  utterance: null,
+  isPaused: false,
+  isPlaying: false,
   
-  // Attempt to set a Japanese voice
-  const voice = getJapaneseVoice();
-  if (voice) {
-    utterance.voice = voice;
-  }
+  play(text, rate, onStart, onEnd, onBoundary) {
+    this.stop(); // Stop previous
+    
+    this.utterance = new SpeechSynthesisUtterance(text);
+    this.utterance.lang = 'ja-JP';
+    this.utterance.rate = rate;
+    
+    const voice = getJapaneseVoice();
+    if (voice) this.utterance.voice = voice;
+    
+    this.utterance.onstart = () => {
+      this.isPlaying = true;
+      this.isPaused = false;
+      if (onStart) onStart();
+    };
+    
+    this.utterance.onend = () => {
+      this.isPlaying = false;
+      this.isPaused = false;
+      if (onEnd) onEnd();
+    };
+    
+    this.utterance.onboundary = (event) => {
+      if (onBoundary) onBoundary(event);
+    };
 
-  window.speechSynthesis.speak(utterance);
-}
+    this.utterance.onerror = (e) => {
+        console.error("TTS Error", e);
+        this.isPlaying = false;
+        this.isPaused = false;
+        if (onEnd) onEnd();
+    }
+    
+    window.speechSynthesis.speak(this.utterance);
+  },
+  
+  pause() {
+    if (this.isPlaying && !this.isPaused) {
+      window.speechSynthesis.pause();
+      this.isPaused = true;
+    }
+  },
+  
+  resume() {
+    if (this.isPlaying && this.isPaused) {
+      window.speechSynthesis.resume();
+      this.isPaused = false;
+    }
+  },
+  
+  stop() {
+    window.speechSynthesis.cancel();
+    this.isPlaying = false;
+    this.isPaused = false;
+  },
+  
+  toggle(text, rate, onStart, onEnd, onBoundary) {
+    if (this.isPlaying) {
+      if (this.isPaused) {
+        this.resume();
+        return 'resumed';
+      } else {
+        this.pause();
+        return 'paused';
+      }
+    } else {
+      this.play(text, rate, onStart, onEnd, onBoundary);
+      return 'started';
+    }
+  }
+};
 
 function addToVocabulary(data, btnElement, originalIcon) {
   chrome.storage.local.get(['fudoki_vocabulary', 'fudoki_language'], (result) => {
