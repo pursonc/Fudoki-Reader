@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "Fudoki Reader",
+  "version": "1.0",
+  "description": "Japanese text analysis and speech synthesis tool.",
+  "icons": {
+    "128": "static/logo.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "static/logo.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "activeTab",
+    "scripting",
+    "sidePanel",
+    "offscreen",
+    "tts"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "css": ["content.css"],
+      "js": ["content.js"]
+    }
+  ],
+  "side_panel": {
+    "default_path": "reader.html"
+  },
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["static/libs/dict/*", "static/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

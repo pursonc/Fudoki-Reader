@@ -1,0 +1,196 @@
+:root {
+  --fudoki-bg: white;
+  --fudoki-text: #333;
+  --fudoki-border: #e0e0e0;
+  --fudoki-reading: #666;
+  --fudoki-romaji: #888;
+  --fudoki-pos-label: #999;
+  --fudoki-btn-color: #4a90e2;
+  --fudoki-btn-hover: #f0f7ff;
+  --fudoki-btn-border-hover: #d0e3ff;
+  --fudoki-translation-border: #eee;
+  --fudoki-translation-text: #555;
+  --fudoki-actions-border: #f0f0f0;
+}
+
+.fudoki-theme-dark {
+  --fudoki-bg: #2d2d2d;
+  --fudoki-text: #e0e0e0;
+  --fudoki-border: #444;
+  --fudoki-reading: #aaa;
+  --fudoki-romaji: #888;
+  --fudoki-pos-label: #777;
+  --fudoki-btn-color: #64b5f6;
+  --fudoki-btn-hover: #3d3d3d;
+  --fudoki-btn-border-hover: #555;
+  --fudoki-translation-border: #444;
+  --fudoki-translation-text: #ccc;
+  --fudoki-actions-border: #444;
+}
+
+.fudoki-popup {
+  position: absolute;
+  z-index: 2147483647; /* Max z-index */
+  background: var(--fudoki-bg);
+  border: 1px solid var(--fudoki-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  padding: 16px;
+  font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--fudoki-text);
+  max-width: 600px;
+  min-width: 200px;
+  text-align: left;
+}
+
+.fudoki-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.fudoki-token {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 2px;
+  position: relative;
+}
+
+.fudoki-reading {
+  font-size: 0.6em;
+  color: var(--fudoki-reading);
+  margin-bottom: 2px;
+  min-height: 1em; /* Keep space even if empty */
+  user-select: none;
+}
+
+.fudoki-reading.empty {
+  /* Hide empty reading space if not needed, or keep for alignment */
+  /* display: none; */ 
+}
+
+.fudoki-romaji {
+  font-size: 0.6em;
+  color: var(--fudoki-romaji);
+  font-style: italic;
+  margin-bottom: 2px;
+  user-select: none;
+}
+
+.fudoki-surface {
+  font-size: 1em;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.fudoki-pos-bar {
+  width: 100%;
+  height: 3px;
+  margin-top: 2px;
+  border-radius: 2px;
+  background: transparent;
+}
+
+.fudoki-pos-label {
+  font-size: 0.5em;
+  color: var(--fudoki-pos-label);
+  margin-top: 2px;
+  user-select: none;
+}
+
+.fudoki-break {
+  width: 100%;
+  height: 0;
+  margin: 5px 0;
+}
+
+/* POS Colors */
+.pos-noun { background-color: #4caf50; } /* Green */
+.pos-verb { background-color: #2196f3; } /* Blue */
+.pos-adj { background-color: #ff9800; } /* Orange */
+.pos-adv { background-color: #9c27b0; } /* Purple */
+.pos-particle { background-color: #f44336; } /* Red */
+.pos-aux { background-color: #795548; } /* Brown */
+.pos-conj { background-color: #607d8b; } /* Blue Grey */
+.pos-adn { background-color: #00bcd4; } /* Cyan */
+.pos-int { background-color: #ffeb3b; } /* Yellow */
+
+.fudoki-popup-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid var(--fudoki-actions-border);
+  padding-top: 12px;
+}
+
+.fudoki-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  color: var(--fudoki-btn-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  width: 32px;
+  height: 32px;
+}
+
+.fudoki-btn:hover {
+  background: var(--fudoki-btn-hover);
+  border-color: var(--fudoki-btn-border-hover);
+}
+
+.fudoki-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.fudoki-btn.loading svg {
+  animation: fudoki-spin 1s linear infinite;
+}
+
+.fudoki-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.fudoki-translation {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--fudoki-translation-border);
+  font-size: 14px;
+  color: var(--fudoki-translation-text);
+  line-height: 1.5;
+}
+
+.fudoki-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  color: #888;
+  font-size: 14px;
+}
+
+.fudoki-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #4a90e2;
+  border-radius: 50%;
+  animation: fudoki-spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes fudoki-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
