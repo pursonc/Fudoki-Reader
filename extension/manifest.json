@@ -15,7 +15,6 @@
   },
   "permissions": [
     "storage",
-    "contextMenus",
     "activeTab",
     "scripting",
     "sidePanel",
