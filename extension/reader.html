@@ -118,26 +118,8 @@
             
             // 如果 Firebase Auth 可用，尝试登出
             if (window.firebaseAuth) {
-              try {
-                // 使用 Firebase 的 signOut
-                import('https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js')
-                  .then(function(authModule) {
-                    return authModule.signOut(window.firebaseAuth);
-                  })
-                  .then(function() {
-                    console.log('✅ Firebase 登出成功');
-                  })
-                  .catch(function(error) {
-                    console.warn('⚠️ Firebase 登出失败:', error);
-                  })
-                  .finally(function() {
-                    // 无论成功失败都跳转到登录页
-                    window.location.href = 'login.html';
-                  });
-              } catch (error) {
-                console.warn('⚠️ Firebase 登出异常:', error);
-                window.location.href = 'login.html';
-              }
+               console.log('Firebase Auth logic removed for extension compliance.');
+               window.location.href = 'login.html';
             } else {
               // 如果没有 Firebase Auth，直接跳转
               console.log('ℹ️ 未检测到 Firebase Auth，直接跳转到登录页');
