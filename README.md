@@ -7,7 +7,7 @@ An interactive Japanese text analysis and speech synthesis Chrome Extension.
 让日语结构可视化的 Chrome 扩展（文本分析与语音朗读）
 
 ![preview](preview.jpg)
-
+![preview-vbook](preview-vbook.jpg)
 ## English
 
 ### Overview
