@@ -1,18 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <linearGradient id="ink" x1="16" y1="96" x2="112" y2="64" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#0B1623"/>
-      <stop offset="1" stop-color="#2B3A4A"/>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4a90e2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9013fe;stop-opacity:1" />
     </linearGradient>
   </defs>
-  <!-- 背景留白 -->
-  <rect width="128" height="128" rx="20" fill="#ffffff"/>
-  <!-- 红日 -->
-  <circle cx="84" cy="40" r="16" fill="#E63946"/>
-  <!-- 墨迹波纹（笔触曲线） -->
-  <path d="M20 80c22-18 48-22 74-14" stroke="url(#ink)" stroke-width="7" stroke-linecap="round"/>
-  <path d="M24 96c26-14 54-16 84-6" stroke="#0B1623" opacity=".8" stroke-width="4" stroke-linecap="round"/>
-  <!-- 简化汉字F形意象（Fudoki首字母） -->
-  <path d="M36 30v42m0-28h20m-20 16h16" stroke="#0B1623" stroke-width="4" stroke-linecap="round"/>
+  <rect width="512" height="512" rx="100" fill="url(#grad1)" />
+  <path d="M160 140 H360 A20 20 0 0 1 380 160 V180 A20 20 0 0 1 360 200 H220 V240 H340 A20 20 0 0 1 360 260 V280 A20 20 0 0 1 340 300 H220 V380 A20 20 0 0 1 200 400 H180 A20 20 0 0 1 160 380 V140 Z" fill="white" />
+  <path d="M380 140 L420 100" stroke="white" stroke-width="30" stroke-linecap="round" />
+  <path d="M420 140 L460 100" stroke="white" stroke-width="30" stroke-linecap="round" />
 </svg>
