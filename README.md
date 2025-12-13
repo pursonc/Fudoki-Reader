@@ -14,6 +14,7 @@ Fudoki Reader is a Chrome Extension that segments Japanese text, shows part-of-s
 ### Features
 *   **Text Analysis**: Kuromoji.js-based segmentation, POS tags, kana, and romaji.
 *   **Dictionary**: Built-in JMDict integration; click a word to view translations.
+*   **Vocabulary Book**: Save words with context and review them using a built-in SRS (Spaced Repetition System).
 *   **Speech Synthesis**: Read text aloud with adjustable speed (0.5–2.0x) and voice selection.
 *   **Offline Capable**: All analysis and dictionary lookups happen locally within the extension.
 *   **Theme Support**: Light, Dark, and System theme modes.
@@ -35,6 +36,7 @@ Fudoki Reader は、ブラウザで動作する日本語テキスト解析・音
 ### 主な機能
 *   **形態素解析**: 分割、品詞、読み（かな／ローマ字）を表示。
 *   **辞書機能**: JMdict と連携、単語をクリックして訳語を表示。
+*   **単語帳**: 文脈付きで単語を保存し、内蔵のSRS（間隔反復システム）で復習できます。
 *   **音声合成**: 読み上げ速度（0.5–2.0倍）や声の選択が可能。
 *   **オフライン対応**: 解析と辞書検索はすべてローカルで行われます。
 *   **テーマ対応**: ライト、ダーク、システム設定に追従するテーマ切り替え。
@@ -56,6 +58,7 @@ Fudoki Reader 是一款基于浏览器的日语文本分析与语音朗读 Chrom
 ### 功能
 *   **文本分析**: 分词、词性、假名与罗马音显示。
 *   **内置词典**: 整合 JMdict；点击单词即可查看释义。
+*   **生词本**: 保存单词及其上下文，并使用内置的 SRS（间隔重复系统）进行复习。
 *   **语音合成**: 支持朗读文本，可调节语速 (0.5–2.0x) 和选择音色。
 *   **离线可用**: 所有分析和词典查询均在本地完成。
 *   **主题支持**: 支持浅色、深色及跟随系统的外观模式。

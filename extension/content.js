@@ -105,6 +105,12 @@ async function showPopup(text, x, y) {
   currentPopup = document.createElement('div');
   currentPopup.className = 'fudoki-popup';
   
+  // Prevent events from bubbling up to document, which would trigger handleSelection
+  // and potentially re-render the popup if DOM elements are modified (like button icons)
+  currentPopup.addEventListener('mouseup', (e) => e.stopPropagation());
+  currentPopup.addEventListener('mousedown', (e) => e.stopPropagation());
+  currentPopup.addEventListener('click', (e) => e.stopPropagation());
+  
   // Apply theme
   if (settings.fudoki_theme === 'dark') {
     currentPopup.classList.add('fudoki-theme-dark');
@@ -218,6 +224,9 @@ function renderResult(tokens, originalText) {
   html += `
     <div class="fudoki-translation" id="fudoki-translation-result" style="display:none;"></div>
     <div class="fudoki-popup-actions">
+      <button class="fudoki-btn" id="fudoki-vocab-btn" title="Add to Vocabulary">
+        <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"/></svg>
+      </button>
       ${showTranslate ? `
       <button class="fudoki-btn" id="fudoki-translate-btn" title="Translate">
         <svg viewBox="0 0 24 24"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
@@ -231,6 +240,36 @@ function renderResult(tokens, originalText) {
   
   currentPopup.innerHTML = html;
   
+  const vocabBtn = currentPopup.querySelector('#fudoki-vocab-btn');
+  // Store the original icon SVG to ensure we can restore it reliably
+  const vocabIconSvg = vocabBtn.innerHTML;
+
+  vocabBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    
+    // Construct reading from tokens for simple display/sorting
+    const reading = tokens.map(t => {
+      if (settings.fudoki_reading_mode === 'hiragana') return t.hiragana || t.reading || t.surface;
+      if (settings.fudoki_reading_mode === 'katakana') return t.reading || t.surface;
+      if (settings.fudoki_reading_mode === 'romaji') return t.romaji || t.surface;
+      return t.reading || t.surface;
+    }).join('');
+
+    // Get translation if available
+    const translationEl = currentPopup.querySelector('#fudoki-translation-result');
+    const translation = (translationEl && translationEl.style.display !== 'none') ? translationEl.textContent : '';
+
+    const data = {
+      word: originalText,
+      reading: reading,
+      context: originalText,
+      tokens: tokens,
+      translation: translation
+    };
+
+    addToVocabulary(data, vocabBtn, vocabIconSvg);
+  });
+
   const playBtn = currentPopup.querySelector('#fudoki-play-btn');
   playBtn.addEventListener('click', (e) => {
     e.stopPropagation(); // Prevent bubbling
@@ -302,6 +341,59 @@ function speakText(text, rate) {
   }
 
   window.speechSynthesis.speak(utterance);
+}
+
+function addToVocabulary(data, btnElement, originalIcon) {
+  chrome.storage.local.get(['fudoki_vocabulary', 'fudoki_language'], (result) => {
+    const vocabulary = result.fudoki_vocabulary || [];
+    const lang = result.fudoki_language || 'en';
+    
+    const messages = {
+      en: { existed: 'Existed', added: 'Added' },
+      zh: { existed: '已存在', added: '已添加' },
+      ja: { existed: '登録済', added: '追加済' }
+    };
+    
+    const msg = messages[lang] || messages.en;
+
+    // Check for duplicates
+    if (vocabulary.some(item => item.word === data.word)) {
+      // Visual feedback for duplicate
+      btnElement.innerHTML = `<span style="font-size:12px; white-space:nowrap; font-weight:bold;">${msg.existed}</span>`;
+      btnElement.style.color = '#f44336'; // Red color for warning
+      
+      setTimeout(() => {
+        btnElement.innerHTML = originalIcon;
+        btnElement.style.color = ''; // Reset color
+      }, 1500);
+      return;
+    }
+
+    const newItem = {
+      id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substr(2),
+      word: data.word,
+      reading: data.reading,
+      context: data.context,
+      tokens: data.tokens,
+      translation: data.translation,
+      addedAt: Date.now(),
+      nextReview: Date.now(), // Due immediately
+      level: 0
+    };
+
+    vocabulary.push(newItem);
+    
+    chrome.storage.local.set({ fudoki_vocabulary: vocabulary }, () => {
+      // Success feedback
+      btnElement.innerHTML = `<span style="font-size:12px; white-space:nowrap; font-weight:bold;">${msg.added}</span>`;
+      btnElement.style.color = '#4caf50';
+      
+      setTimeout(() => {
+        btnElement.innerHTML = originalIcon;
+        btnElement.style.color = '';
+      }, 1500);
+    });
+  });
 }
 
 // Ensure voices are loaded (Chrome requires this sometimes)

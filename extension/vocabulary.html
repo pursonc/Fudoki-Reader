@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Fudoki Vocabulary</title>
+  <link rel="stylesheet" href="static/styles.css">
+  <link rel="stylesheet" href="vocabulary.css">
+</head>
+<body>
+  <div class="vocab-container">
+    <header class="vocab-header">
+      <h1>Vocabulary Book</h1>
+      <div class="vocab-stats">
+        <span id="due-count">0</span> due
+      </div>
+    </header>
+    
+    <div class="vocab-tabs">
+      <button class="tab-btn active" data-tab="review">Review</button>
+      <button class="tab-btn" data-tab="all">All Words</button>
+    </div>
+
+    <div id="vocab-list" class="vocab-list">
+      <!-- Items will be injected here -->
+    </div>
+
+    <div id="empty-state" class="empty-state" style="display: none;">
+      <div class="empty-icon">📚</div>
+      <p>No words found.</p>
+      <p class="sub-text">Select text on any page to add words.</p>
+    </div>
+  </div>
+
+  <script src="vocabulary.js"></script>
+</body>
+</html>
