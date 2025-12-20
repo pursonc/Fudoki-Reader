@@ -6,6 +6,8 @@ An interactive Japanese text analysis and speech synthesis Chrome Extension.
 
 让日语结构可视化的 Chrome 扩展（文本分析与语音朗读）
 
+[![Available in the Chrome Web Store](https://storage.googleapis.com/web-dev-uploads/image/WlD8wC6g8khYWPJUsQceQkhXSlv1/i758L5X89l6h9oUu8M12.png)](https://chromewebstore.google.com/detail/fudoki-reader/nkjanfhhhmammefnfeenbeioiodhbkij)
+
 ![preview](preview.jpg)
 ![preview-vbook](preview-vbook.jpg)
 ## English
