@@ -47,6 +47,37 @@
   text-align: left;
 }
 
+.fudoki-selection-popup {
+  max-width: 320px;
+  min-width: 128px;
+  padding: 10px;
+}
+
+.fudoki-reader-popup {
+  width: min(620px, calc(100vw - 24px));
+  max-width: min(620px, calc(100vw - 24px));
+  padding: 14px;
+}
+
+.fudoki-selection-text {
+  max-width: 280px;
+  max-height: 96px;
+  overflow: auto;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--fudoki-text);
+  overflow-wrap: anywhere;
+}
+
+.fudoki-reader-content {
+  max-height: 220px;
+  overflow: auto;
+  padding: 2px 0 6px;
+  align-items: start;
+  column-gap: 3px;
+  row-gap: 4px;
+}
+
 .fudoki-content {
   display: flex;
   flex-wrap: wrap;
@@ -64,21 +95,30 @@
   transition: background-color 0.2s;
 }
 
+.fudoki-reader-token {
+  display: grid;
+  grid-template-rows: 1.05em 1.45em 3px 0.9em;
+  align-items: center;
+  justify-items: center;
+  min-height: 3.7em;
+  vertical-align: top;
+}
+
 .fudoki-token.fudoki-highlight {
   background-color: var(--fudoki-highlight-bg);
+  outline: 1px solid rgba(245, 158, 11, 0.35);
 }
 
 .fudoki-reading {
   font-size: 0.6em;
   color: var(--fudoki-reading);
-  margin-bottom: 2px;
-  min-height: 1em; /* Keep space even if empty */
+  min-height: 1.05em;
+  line-height: 1.05;
   user-select: none;
 }
 
 .fudoki-reading.empty {
-  /* Hide empty reading space if not needed, or keep for alignment */
-  /* display: none; */ 
+  visibility: hidden;
 }
 
 .fudoki-romaji {
@@ -92,13 +132,12 @@
 .fudoki-surface {
   font-size: 1em;
   font-weight: 500;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 .fudoki-pos-bar {
   width: 100%;
   height: 3px;
-  margin-top: 2px;
   border-radius: 2px;
   background: transparent;
 }
@@ -106,7 +145,8 @@
 .fudoki-pos-label {
   font-size: 0.5em;
   color: var(--fudoki-pos-label);
-  margin-top: 2px;
+  min-height: 0.9em;
+  line-height: 0.9;
   user-select: none;
 }
 
@@ -128,11 +168,29 @@
 .pos-int { background-color: #ffeb3b; } /* Yellow */
 
 .fudoki-popup-actions {
-  margin-top: 16px;
+  margin-top: 10px;
   display: flex;
   justify-content: flex-end;
   border-top: 1px solid var(--fudoki-actions-border);
-  padding-top: 12px;
+  padding-top: 8px;
+  gap: 4px;
+}
+
+.fudoki-speed-row {
+  display: grid;
+  grid-template-columns: auto minmax(120px, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--fudoki-translation-border);
+  color: var(--fudoki-translation-text);
+  font-size: 12px;
+}
+
+.fudoki-speed-row input[type="range"] {
+  width: 100%;
+  accent-color: var(--fudoki-btn-color);
 }
 
 .fudoki-btn {
@@ -170,6 +228,25 @@
   fill: currentColor;
 }
 
+.fudoki-emoji-btn {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.fudoki-btn.fudoki-btn-message {
+  width: auto;
+  min-width: 56px;
+  border-radius: 16px;
+  padding-inline: 10px;
+}
+
+.fudoki-btn-text {
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
 .fudoki-translation {
   margin-top: 12px;
   padding-top: 12px;
@@ -201,4 +278,99 @@
 @keyframes fudoki-spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.fudoki-inline-wrap {
+  font: inherit;
+  color: inherit;
+}
+
+.fudoki-inline-token {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  vertical-align: baseline;
+  margin: 0 0.02em;
+  line-height: 1.05;
+  max-width: 100%;
+}
+
+.fudoki-inline-token ruby {
+  ruby-position: over;
+  line-height: 1.4;
+}
+
+.fudoki-inline-token rt {
+  color: #64748b;
+  font-size: 0.55em;
+  line-height: 1.1;
+  user-select: none;
+}
+
+.fudoki-inline-meaning {
+  display: none;
+  max-width: 6em;
+  margin-top: -0.1em;
+  color: #0f766e;
+  font-size: 0.56em;
+  line-height: 1.05;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.fudoki-show-meaning .fudoki-inline-meaning {
+  display: block;
+}
+
+.fudoki-inline-token:hover {
+  background: rgba(37, 99, 235, 0.08);
+  border-radius: 4px;
+}
+
+.fudoki-sentence-translation {
+  position: absolute;
+  z-index: 2147483646;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(320px, 80vw);
+  padding: 8px 10px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.16);
+  color: #172033;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.fudoki-reader-dark .fudoki-inline-token rt {
+  color: #a1a1aa;
+}
+
+.fudoki-reader-dark .fudoki-inline-meaning {
+  color: #5eead4;
+}
+
+.fudoki-reader-dark .fudoki-sentence-translation {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(24, 24, 27, 0.96);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.38);
+  color: #f4f4f5;
+}
+
+@media (max-width: 720px) {
+  .fudoki-sentence-translation {
+    left: 0;
+    transform: none;
+  }
 }

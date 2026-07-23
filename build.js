@@ -6,6 +6,24 @@ const archiver = require('archiver');
 const EXTENSION_DIR = path.join(__dirname, 'extension');
 const DIST_DIR = path.join(__dirname, 'dist');
 const BUILD_DIR = path.join(DIST_DIR, 'unpacked');
+const PACKAGE_EXCLUDES = [
+  '.DS_Store',
+  'reader.html',
+  'static/mobile.css',
+  'static/main-js.js',
+  'static/samples.json',
+  'static/js',
+  'static/libs/dict/dictionary-service.js',
+  'static/libs/dict/chunks'
+];
+
+function shouldPackage(sourcePath) {
+  const relativePath = path.relative(EXTENSION_DIR, sourcePath);
+  return !PACKAGE_EXCLUDES.some((excludedPath) => (
+    relativePath === excludedPath ||
+    relativePath.startsWith(`${excludedPath}${path.sep}`)
+  ));
+}
 
 async function build() {
   console.log('🚀 Starting build process...');
@@ -16,7 +34,7 @@ async function build() {
 
   // 2. Copy extension files to build directory
   console.log('📂 Copying files...');
-  await fs.copy(EXTENSION_DIR, BUILD_DIR);
+  await fs.copy(EXTENSION_DIR, BUILD_DIR, { filter: shouldPackage });
 
   // 3. Read manifest to get version
   const manifest = await fs.readJson(path.join(BUILD_DIR, 'manifest.json'));
