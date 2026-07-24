@@ -1,4 +1,4 @@
-const FUDOKI_UNINSTALL_SURVEY_URL = 'https://YOUR_WORKER_DOMAIN/uninstall';
+const FUDOKI_UNINSTALL_SURVEY_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfjJZ7TOevSTNbtfk0PuBCpK8W3eO-YvWnMvXu4l5-b2TeUTQ/viewform?usp=dialog';
 
 chrome.runtime.onInstalled.addListener((details) => {
   // Context menu removed as per user request
@@ -21,17 +21,7 @@ chrome.runtime.onStartup.addListener(() => {
 });
 
 function updateUninstallSurveyUrl() {
-  if (FUDOKI_UNINSTALL_SURVEY_URL.includes('YOUR_WORKER_DOMAIN')) {
-    return;
-  }
-  const manifest = chrome.runtime.getManifest();
-  const params = new URLSearchParams({
-    version: manifest.version || '',
-    locale: chrome.i18n?.getUILanguage?.() || '',
-    extension_id: chrome.runtime.id || ''
-  });
-
-  chrome.runtime.setUninstallURL(`${FUDOKI_UNINSTALL_SURVEY_URL}?${params.toString()}`);
+  chrome.runtime.setUninstallURL(FUDOKI_UNINSTALL_SURVEY_URL);
 }
 
 // Offscreen document management
