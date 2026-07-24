@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.1
+
+- Remove unused `activeTab` and `tts` permissions.
+- Limit background network access to the optional Google translation service.
+- Correct Chrome Web Store permission disclosures for local text analysis.
+- Add a public privacy policy covering local storage, translation, feedback, and support links.
+
 ## 1.1.0
 
 - Add inline Japanese readings with hiragana, katakana, and romaji modes.

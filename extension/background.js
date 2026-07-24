@@ -112,14 +112,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       }
     })();
     return true; // Keep channel open
-  } else if (request.type === 'TTS_SPEAK') {
-    // Stop any current speech before starting new one
-    chrome.tts.stop();
-    
-    chrome.tts.speak(request.text, {
-      lang: 'ja-JP',
-      rate: parseFloat(request.rate) || 1.0
-    });
   } else if (request.type === 'TRANSLATE_TEXT') {
     (async () => {
       try {
