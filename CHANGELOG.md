@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.2
+
+- Open the optional Google Forms feedback survey after the extension is uninstalled.
+- Send no extension identifiers or usage details with the uninstall survey link.
+
 ## 1.1.1
 
 - Remove unused `activeTab` and `tts` permissions.
