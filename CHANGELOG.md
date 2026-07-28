@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.3
+
+- Translate the original Japanese sentence without injected readings or short meanings.
+- Locate sentences from the clicked word's exact source position, including repeated words.
+- Use the same clean sentence extraction for selection-popup translations.
+
 ## 1.1.2
 
 - Open the optional Google Forms feedback survey after the extension is uninstalled.

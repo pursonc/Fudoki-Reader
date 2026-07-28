@@ -875,9 +875,13 @@ function replaceTextNodeWithRuby(textNode, tokens, originalText) {
   const wrapper = document.createElement('span');
   wrapper.className = 'fudoki-inline-wrap';
   wrapper.dataset.originalText = originalText;
+  let sourceOffset = 0;
 
   tokens.forEach((token) => {
     if (!token.surface) return;
+    const matchedOffset = originalText.indexOf(token.surface, sourceOffset);
+    const tokenStart = matchedOffset >= 0 ? matchedOffset : sourceOffset;
+    sourceOffset = tokenStart + token.surface.length;
 
     const shouldAnnotate = KANJI_RE.test(token.surface) && getReading(token);
     if (!shouldAnnotate) {
@@ -891,6 +895,7 @@ function replaceTextNodeWithRuby(textNode, tokens, originalText) {
     tokenEl.dataset.katakana = token.reading || '';
     tokenEl.dataset.romaji = token.romaji || '';
     tokenEl.dataset.surface = token.surface;
+    tokenEl.dataset.sourceStart = String(tokenStart);
 
     const ruby = document.createElement('ruby');
     const surface = document.createElement('span');
@@ -1021,15 +1026,141 @@ function isFudokiUi(target) {
 }
 
 function findSentenceForNode(node) {
-  const text = node.closest(BLOCK_SELECTOR)?.innerText || node.parentElement?.innerText || '';
+  const block = node.closest(BLOCK_SELECTOR);
+  const source = getCleanBlockSource(block, node);
+  const text = source.text;
   if (!text) return '';
+
   const surface = node.dataset.surface || '';
-  const index = surface ? text.indexOf(surface) : -1;
-  const pos = index >= 0 ? index : 0;
-  const start = Math.max(text.lastIndexOf('。', pos), text.lastIndexOf('！', pos), text.lastIndexOf('？', pos), text.lastIndexOf('\n', pos)) + 1;
-  const endings = ['。', '！', '？', '\n'].map((mark) => text.indexOf(mark, pos)).filter((i) => i >= 0);
-  const end = endings.length ? Math.min(...endings) + 1 : Math.min(text.length, start + 160);
-  return text.slice(start, end).trim();
+  const position = source.position >= 0
+    ? source.position
+    : Math.max(0, surface ? text.indexOf(surface) : 0);
+
+  return extractSentenceAt(text, position, 220);
+}
+
+function getCleanBlockSource(block, targetNode = null, targetOffset = 0) {
+  if (!block) return { text: '', position: -1 };
+
+  let text = '';
+  let position = -1;
+
+  const visit = (node) => {
+    if (!node) return;
+
+    if (node.nodeType === Node.TEXT_NODE) {
+      if (node === targetNode) {
+        const offset = Math.max(0, Math.min(targetOffset || 0, (node.nodeValue || '').length));
+        position = text.length + offset;
+      }
+      text += node.nodeValue || '';
+      return;
+    }
+
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+    const element = node;
+
+    if (element.classList.contains('fudoki-inline-wrap')) {
+      const originalText = getInlineWrapperSource(element);
+      if (targetNode && (element === targetNode || element.contains(targetNode))) {
+        position = text.length + getInlineWrapperOffset(element, targetNode, targetOffset);
+      }
+      text += originalText;
+      return;
+    }
+
+    if (element.matches(
+      'rt,script,style,noscript,.fudoki-inline-meaning,.fudoki-sentence-translation,' +
+      '#fudoki-reader-rail-host,.fudoki-popup'
+    )) {
+      return;
+    }
+
+    if (element.tagName === 'BR') {
+      text += '\n';
+      return;
+    }
+
+    Array.from(element.childNodes).forEach(visit);
+  };
+
+  visit(block);
+  return { text, position };
+}
+
+function getInlineWrapperSource(wrapper) {
+  if (typeof wrapper.dataset.originalText === 'string') {
+    return wrapper.dataset.originalText;
+  }
+
+  return Array.from(wrapper.childNodes)
+    .map((child) => getInlineChildSource(child))
+    .join('');
+}
+
+function getInlineWrapperOffset(wrapper, targetNode, targetOffset = 0) {
+  const targetElement = targetNode?.nodeType === Node.ELEMENT_NODE
+    ? targetNode
+    : targetNode?.parentElement;
+  const token = targetElement?.closest?.('.fudoki-inline-token');
+
+  if (token && wrapper.contains(token)) {
+    const storedOffset = Number(token.dataset.sourceStart);
+    if (Number.isFinite(storedOffset)) return storedOffset;
+  }
+
+  let offset = 0;
+  const children = Array.from(wrapper.childNodes);
+
+  if (targetNode === wrapper) {
+    return children
+      .slice(0, Math.max(0, Math.min(targetOffset || 0, children.length)))
+      .reduce((total, child) => total + getInlineChildSource(child).length, 0);
+  }
+
+  for (const child of children) {
+    if (child === targetNode) {
+      const childText = getInlineChildSource(child);
+      return offset + Math.max(0, Math.min(targetOffset || 0, childText.length));
+    }
+    if (child.nodeType === Node.ELEMENT_NODE && child.contains(targetNode)) {
+      return offset;
+    }
+    offset += getInlineChildSource(child).length;
+  }
+
+  return 0;
+}
+
+function getInlineChildSource(child) {
+  if (child.nodeType === Node.TEXT_NODE) return child.nodeValue || '';
+  if (child.nodeType !== Node.ELEMENT_NODE) return '';
+  if (child.classList.contains('fudoki-inline-token')) {
+    return child.dataset.surface || '';
+  }
+  return child.textContent || '';
+}
+
+function extractSentenceAt(text, position, maxLength = 220) {
+  if (!text) return '';
+
+  const sentenceMarks = ['。', '！', '？', '.', '!', '?', '\n'];
+  const safePosition = Math.max(0, Math.min(Number.isFinite(position) ? position : 0, text.length));
+  const previousPosition = Math.max(0, safePosition - 1);
+  const start = Math.max(
+    ...sentenceMarks.map((mark) => text.lastIndexOf(mark, previousPosition))
+  ) + 1;
+  const endings = sentenceMarks
+    .map((mark) => text.indexOf(mark, safePosition))
+    .filter((index) => index >= 0);
+  const end = endings.length
+    ? Math.min(...endings) + 1
+    : Math.min(text.length, start + maxLength);
+
+  return text
+    .slice(start, end)
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 async function showSentenceTranslation(sentence, anchor) {
@@ -1122,29 +1253,24 @@ function getSentenceForSelection(selection, selectedText) {
     ? range.startContainer.parentElement
     : range?.startContainer;
   const block = container?.closest?.(BLOCK_SELECTOR);
-  const blockText = (block?.innerText || block?.textContent || '').replace(/\s+/g, ' ').trim();
+  const source = getCleanBlockSource(block, range?.startContainer, range?.startOffset || 0);
+  const blockText = source.text;
   const selectionText = selectedText.replace(/\s+/g, ' ').trim();
 
-  if (!blockText || !selectionText || selectionText.length > 80) {
+  if (!blockText || !selectionText) {
     return selectedText;
   }
+
+  if (source.position >= 0) {
+    return extractSentenceAt(blockText, source.position, 220) || selectedText;
+  }
+
+  if (selectionText.length > 80) return selectedText;
 
   const index = blockText.indexOf(selectionText);
   if (index < 0) return selectedText;
 
-  const start = Math.max(
-    blockText.lastIndexOf('。', index),
-    blockText.lastIndexOf('！', index),
-    blockText.lastIndexOf('？', index),
-    blockText.lastIndexOf('.', index),
-    blockText.lastIndexOf('!', index),
-    blockText.lastIndexOf('?', index)
-  ) + 1;
-  const endings = ['。', '！', '？', '.', '!', '?']
-    .map((mark) => blockText.indexOf(mark, index + selectionText.length))
-    .filter((pos) => pos >= 0);
-  const end = endings.length ? Math.min(...endings) + 1 : Math.min(blockText.length, start + 220);
-  const sentence = blockText.slice(start, end).trim();
+  const sentence = extractSentenceAt(blockText, index, 220);
 
   return sentence && sentence.length >= selectionText.length ? sentence : selectedText;
 }
