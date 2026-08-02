@@ -1,5 +1,5 @@
 const FUDOKI_FEEDBACK_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfjJZ7TOevSTNbtfk0PuBCpK8W3eO-YvWnMvXu4l5-b2TeUTQ/viewform?usp=dialog';
-const FUDOKI_WISE_TAG_URL = 'https://wise.com/pay/me/puxinc1?utm_source=request_flow';
+const FUDOKI_PAYPAL_URL = 'https://paypal.me/pursonc';
 
 document.addEventListener('DOMContentLoaded', () => {
   const enableCheckbox = document.getElementById('enable-extension');
@@ -213,17 +213,15 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.tabs.create({ url });
   }
 
-  function openWise(amount) {
-    if (FUDOKI_WISE_TAG_URL.includes('REPLACE_WITH_')) {
-      alert('请先把 Wisetag 链接填入 FUDOKI_WISE_TAG_URL。');
+  function openPayPal(amount) {
+    if (FUDOKI_PAYPAL_URL.includes('REPLACE_WITH_')) {
+      alert('请先把 PayPal.Me 链接填入 FUDOKI_PAYPAL_URL。');
       return;
     }
-    const url = new URL(FUDOKI_WISE_TAG_URL);
-    if (amount && amount !== 'custom') {
-      url.searchParams.set('amount', amount);
-      url.searchParams.set('currency', 'USD');
-    }
-    chrome.tabs.create({ url: url.toString() });
+    const url = amount && amount !== 'custom'
+      ? `${FUDOKI_PAYPAL_URL}/${amount}USD`
+      : FUDOKI_PAYPAL_URL;
+    chrome.tabs.create({ url });
   }
 
   ttsSpeedInput.addEventListener('input', () => {
@@ -267,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.querySelectorAll('.support-btn').forEach((button) => {
-    button.addEventListener('click', () => openWise(button.dataset.amount));
+    button.addEventListener('click', () => openPayPal(button.dataset.amount));
   });
 
   [

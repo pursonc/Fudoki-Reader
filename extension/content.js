@@ -1,7 +1,7 @@
 // Fudoki Content Script
 
 const FUDOKI_FEEDBACK_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfjJZ7TOevSTNbtfk0PuBCpK8W3eO-YvWnMvXu4l5-b2TeUTQ/viewform?usp=dialog';
-const FUDOKI_WISE_TAG_URL = 'https://wise.com/pay/me/puxinc1?utm_source=request_flow';
+const FUDOKI_PAYPAL_URL = 'https://paypal.me/pursonc';
 const FUDOKI_LOGO_URL = chrome.runtime.getURL('static/logo.png');
 const INLINE_SCAN_LIMIT = 140;
 const INLINE_CHAR_LIMIT = 12000;
@@ -626,7 +626,7 @@ function buildRail() {
     openConfiguredUrl(FUDOKI_FEEDBACK_URL, 'Google Form link is not configured.');
   });
   shadow.querySelectorAll('.amount').forEach((button) => {
-    button.addEventListener('click', () => openWise(button.dataset.amount));
+    button.addEventListener('click', () => openPayPal(button.dataset.amount));
   });
 
   updateRailLanguage();
@@ -1203,17 +1203,15 @@ function removeSentenceTranslations() {
   document.querySelectorAll('.fudoki-sentence-translation').forEach((bubble) => bubble.remove());
 }
 
-function openWise(amount) {
-  if (FUDOKI_WISE_TAG_URL.includes('REPLACE_WITH_')) {
-    alert('Wise link is not configured.');
+function openPayPal(amount) {
+  if (FUDOKI_PAYPAL_URL.includes('REPLACE_WITH_')) {
+    alert('PayPal.Me link is not configured.');
     return;
   }
-  const url = new URL(FUDOKI_WISE_TAG_URL);
-  if (amount && amount !== 'custom') {
-    url.searchParams.set('amount', amount);
-    url.searchParams.set('currency', 'USD');
-  }
-  window.open(url.toString(), '_blank', 'noopener,noreferrer');
+  const url = amount && amount !== 'custom'
+    ? `${FUDOKI_PAYPAL_URL}/${amount}USD`
+    : FUDOKI_PAYPAL_URL;
+  window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 function openConfiguredUrl(url, fallbackMessage) {

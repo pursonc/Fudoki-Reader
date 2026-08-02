@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.4
+
+- Replace all Wise support links with PayPal.Me.
+- Prefill the 1 USD and 5 USD support amounts while keeping a custom option.
+- Update the privacy policy to identify PayPal as the external payment service.
+
 ## 1.1.3
 
 - Translate the original Japanese sentence without injected readings or short meanings.

@@ -42,7 +42,7 @@ Fudoki Reader can open the following external services only after the user
 chooses the corresponding action:
 
 - Google Forms for optional feedback
-- Wise for optional financial support
+- PayPal for optional financial support
 
 Information entered on those external websites is handled by the respective
 service under its own privacy policy. Fudoki Reader does not receive payment
